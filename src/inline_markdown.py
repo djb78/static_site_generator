@@ -103,6 +103,15 @@ def split_nodes_url(old_nodes: list[TextNode], url_type: TextType) -> list[TextN
             new_nodes.extend(split_nodes_url([TextNode(other_nodes[1], node.text_type)], url_type))
     return new_nodes
 
+def text_to_textnodes(text):
+    text_nodes = [TextNode(text, TextType.PLAIN)]
+    text_nodes = split_nodes_delimiter(text_nodes, '**', TextType.BOLD)
+    text_nodes = split_nodes_delimiter(text_nodes, '_', TextType.ITALIC)
+    text_nodes = split_nodes_delimiter(text_nodes, '`', TextType.CODE)
+    text_nodes = split_nodes_link(text_nodes)
+    text_nodes = split_nodes_image(text_nodes)
+    return text_nodes
+
 
 # images
 r"!\[([^\[\]]*)\]\(([^\(\)]*)\)"

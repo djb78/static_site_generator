@@ -1,6 +1,6 @@
 import unittest
 from textnode import TextNode, TextType
-from inline_markdown import split_nodes_delimiter, extract_markdown_images, extract_markdown_links, split_nodes_image, split_nodes_link
+from inline_markdown import split_nodes_delimiter, extract_markdown_images, extract_markdown_links, split_nodes_image, split_nodes_link, text_to_textnodes
 
 class TestMarkdownToText(unittest.TestCase):
     # split_nodes_delimiter
@@ -261,6 +261,60 @@ class TestMarkdownToText(unittest.TestCase):
             [TextNode("what does [ do in markdown? why is ther a ( after the next ]?", TextType.PLAIN)],
             new_nodes
         )
-        
+
+# text_to_textnodes
+#==========================
+    def test_text_to_textnodes_all(self):
+        text = "This is **text** with an _italic_ word and a `code block` and an ![obi wan image](https://i.imgur.com/fJRm4Vk.jpeg) and a [link](https://boot.dev)"
+        new_nodes = text_to_textnodes(text)
+        self.assertEqual(
+            [
+                TextNode("This is ", TextType.PLAIN),
+                TextNode("text", TextType.BOLD),
+                TextNode(" with an ", TextType.PLAIN),
+                TextNode("italic", TextType.ITALIC),
+                TextNode(" word and a ", TextType.PLAIN),
+                TextNode("code block", TextType.CODE),
+                TextNode(" and an ", TextType.PLAIN),
+                TextNode("obi wan image", TextType.IMAGE, "https://i.imgur.com/fJRm4Vk.jpeg"),
+                TextNode(" and a ", TextType.PLAIN),
+                TextNode("link", TextType.LINK, "https://boot.dev"),
+            ], new_nodes
+        )
+
+    def test_text_to_textnodes_none(self):
+        text = "just plain text here."
+        new_nodes = text_to_textnodes(text)
+        self.assertEqual([TextNode("just plain text here.", TextType.PLAIN)], new_nodes)
+
+    def test_text_to_textnodes_empty(self):
+        text = ""
+        new_nodes = text_to_textnodes(text)
+        self.assertEqual([], new_nodes)
+
+    def test_text_to_textnodes_type(self):
+        text = "**a bold node**"
+        new_nodes = text_to_textnodes(text)
+        self.assertEqual([TextNode("a bold node", TextType.BOLD)], new_nodes)
+
+    def test_text_to_textnodes_adjacent(self):
+        text = "This is **text**_italic_`code block`![obi wan image](https://i.imgur.com/fJRm4Vk.jpeg)[link](https://boot.dev)"
+        new_nodes = text_to_textnodes(text)
+        self.assertEqual(
+            [
+                TextNode("This is ", TextType.PLAIN),
+                TextNode("text", TextType.BOLD),
+                TextNode("italic", TextType.ITALIC),
+                TextNode("code block", TextType.CODE),
+                TextNode("obi wan image", TextType.IMAGE, "https://i.imgur.com/fJRm4Vk.jpeg"),
+                TextNode("link", TextType.LINK, "https://boot.dev"),
+            ], new_nodes
+        )
+
+    #def test_text_to_textnodes_syntax(self):
+    #    node = TextNode("there is a **bold part but it never ends", TextType.PLAIN)
+    #    new_nodes = text_to_textnodes(node)
+    #    self.assertEqual([TextNode("there is a **bold part but it never ends", TextType.PLAIN)], new_nodes)
+
 if __name__ == "__main__":
     unittest.main()
