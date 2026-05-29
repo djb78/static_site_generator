@@ -311,10 +311,11 @@ class TestMarkdownToText(unittest.TestCase):
             ], new_nodes
         )
 
-    #def test_text_to_textnodes_syntax(self):
-    #    node = TextNode("there is a **bold part but it never ends", TextType.PLAIN)
-    #    new_nodes = text_to_textnodes(node)
-    #    self.assertEqual([TextNode("there is a **bold part but it never ends", TextType.PLAIN)], new_nodes)
+    def test_text_to_textnodes_invalid_delimiter(self):
+        text = "there is a **bold part but it never ends"
+        with self.assertRaises(ValueError) as ctx:
+            text_to_textnodes(text)
+        self.assertIn("Invalid markdown", str(ctx.exception))
 
 if __name__ == "__main__":
     unittest.main()
