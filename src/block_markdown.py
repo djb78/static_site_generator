@@ -22,18 +22,21 @@ def markdown_to_blocks(markdown):
 def block_to_blocktype(block):
     # block: string representing a single block w/o leading/trailing whitespace
     # return BlockType
+    if not block: return None
 
     # heading
     first_word = block.split(' ', 1)[0]
     if 1 <= len(first_word) <= 6 and all(c == '#' for c in first_word): return BlockType.HEADING
     # code
     if block.startswith("```") and '\n' in block and block.endswith("```"): return BlockType.CODE
-    # quote
+    
     lines = block.splitlines()
+    # quote
     if all(line.startswith(">") for line in lines): return BlockType.QUOTE
     # unordered list
     if all(line.startswith("- ") for line in lines): return BlockType.UNORDERED_LIST
     # ordered list
     if all(line.startswith(f"{i}. ") for i, line in enumerate(lines, start=1)): return BlockType.ORDERED_LIST
+    
     # paragraph
     return BlockType.PARAGRAPH
