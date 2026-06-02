@@ -1,5 +1,6 @@
 import os, shutil
-from textnode import TextNode
+from markdown_to_html import markdown_to_html_node
+from block_markdown import extract_title
 
 def copy_directory(source, destination):
     # make sure source is valid
@@ -21,10 +22,35 @@ def copy_directory(source, destination):
             os.mkdir(destination_path)
             copy_directory(child_path, destination_path)
 
+def generate_page(from_path, template_path, dest_path):
+    print(f"Generating page from {from_path} to {dest_path} using {template_path}")
+    markdown_file = template = ""
+    try:
+        with open(from_path, 'r') as f:
+            markdown_file = f.read()
+        with open(template_path, 'r') as f:
+            template = f.read()
+    except FileNotFoundError:
+        pass
+
+    if not markdown_file: raise Exception(f"missing content: {from_path}")
+    if not template: raise Exception(f"missing template: {template_path}")
+    
+    title = extract_title(markdown_file)
+    html_file = markdown_to_html_node(markdown_file).to_html()
+    page = template.replace("{{ Title }}", title).replace("{{ Content }}", html_file)
+
+    directory = os.path.dirname(dest_path)
+    os.makedirs(directory, exist_ok=True)
+    try:
+        with open(dest_path, "w") as f:
+            f.write(page)
+    except FileNotFoundError:
+        raise Exception(f"could not write to {dest_path}")
+
 def main():
-    node = TextNode("dummy text", "link", "https://wtf.com")
-    print(node)
     copy_directory("static", "public")
+    generate_page("content/index.md", "template.html", "public/index.html")
 
 if __name__ == "__main__":
     main()
