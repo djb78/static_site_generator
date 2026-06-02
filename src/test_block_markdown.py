@@ -2,7 +2,8 @@ import unittest
 from block_markdown import (
     BlockType,
     markdown_to_blocks,
-    block_to_blocktype    
+    block_to_blocktype,
+    extract_title  
 )
 
 class TestMarkdownToBlocks(unittest.TestCase):
@@ -150,6 +151,25 @@ This is the same paragraph on a new line
         type = block_to_blocktype(block)
         self.assertEqual(type, BlockType.PARAGRAPH)
     
+# extract_title
+# ==================
+    def test_extract_title(self):
+        markdown = "# the title"
+        title = extract_title(markdown)
+        self.assertEqual(title, "the title")
+
+    def test_extract_title_none(self):
+        markdown = "we gotta like do away with labels man/n/nyou're not your title"
+        self.assertRaises(Exception, extract_title, markdown)
+        # with self.assertRaises(Exception) as context:
+        #   extract_title(markdown)
+        # self.assertEqual(str(content.exception), f"no header found in: \"{markdown}\"")
+    
+    def test_extract_title_multiblock(self):
+        markdown = "there's a title here somewhere\n\n## This is it!\n\n>maybe there could be another one\n\n# like this"
+        title = extract_title(markdown)
+        self.assertEqual(title, "This is it!")
+
 
 if __name__ == "__main__":
     unittest.main()

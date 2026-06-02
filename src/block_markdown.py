@@ -40,3 +40,11 @@ def block_to_blocktype(block):
     
     # paragraph
     return BlockType.PARAGRAPH
+
+def extract_title(markdown):
+    blocks = markdown_to_blocks(markdown)
+    for block in blocks:
+        if block_to_blocktype(block) != BlockType.HEADING:
+            continue
+        return block.split(' ', 1)[1]
+    raise Exception(f"no header found in: \"{markdown}\"")
