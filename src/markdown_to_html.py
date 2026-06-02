@@ -17,7 +17,6 @@ def get_block_tag(type):
 def markdown_to_html_node(md_doc):
     md_blocks = markdown_to_blocks(md_doc)
     html_blocks = []
-    print(f"MD BLOCKS: {md_blocks}")
     for md_block in md_blocks:
         pre_nested = False
         html_block = child_html = child_value = None
