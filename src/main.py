@@ -47,14 +47,25 @@ def generate_page(from_path, template_path, dest_path):
             f.write(page)
     except FileNotFoundError:
         raise Exception(f"could not write to {dest_path}")
+    
+def generate_pages_recursive(content_dir_path, template_path, dest_dir_path):
+    files_and_folders = os.listdir(content_dir_path)
+    # for each file/folder
+    for file_or_folder in files_and_folders:
+        file_or_folder_path = os.path.join(content_dir_path, file_or_folder)
+        if os.path.isfile(file_or_folder_path):
+            # if file generate page
+            dest_path = os.path.join(dest_dir_path, file_or_folder.split('.')[0]+'.html')
+            generate_page(file_or_folder_path, template_path, dest_path)
+        else: # if folder recurse
+            dest_path = os.path.join(dest_dir_path, file_or_folder)
+            generate_pages_recursive(file_or_folder_path, template_path, dest_path)
+
+
 
 def main():
     copy_directory("static", "public")
-    generate_page("content/index.md", "template.html", "public/index.html")
-    generate_page("content/contact/index.md", "template.html", "public/contact/index.html")
-    generate_page("content/blog/glorfindel/index.md", "template.html", "public/blog/glorfindel/index.html")
-    generate_page("content/blog/majesty/index.md", "template.html", "public/blog/majesty/index.html")
-    generate_page("content/blog/tom/index.md", "template.html", "public/blog/tom/index.html")
+    generate_pages_recursive('content', 'template.html', 'public')
 
 if __name__ == "__main__":
     main()
